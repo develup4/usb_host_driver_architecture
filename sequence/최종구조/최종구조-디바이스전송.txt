@@ -1,0 +1,28 @@
+
+OperationSystemAdapter->StreamPipe: send IRP
+StreamPipe->StateMachine: change state
+StreamPipe->IRPDescriptorPool: request memory block
+IRPDescriptorPool->StreamPipe: memory block
+StreamPipe->IRPDescriptor: make IRP descriptor
+StreamPipe->IRPQueue: push IRP descriptor
+alt StreamPipe 쓰레드가 스케쥴링되면
+loop Queue 안의 모든 IRP가 전송될 때까지
+StreamPipe->IRPQueue: get front descriptor
+StreamPipe->IRPDescriptor: get address and offset
+StreamPipe->HostControllerAdapter: push to host controller buffer
+HostControllerAdapter->HostController: send Transaction
+HostController->HostControllerAdapter: ACK
+HostControllerAdapter->StreamPipe: ACK with Data Rate
+StreamPipe->IRPDescriptor: update offset
+StreamPipe->LedControllerAdapter: deliver Data Rate
+alt 마지막 IRP라면
+StreamPipe->IRPQueue: pop IRP descriptor
+StreamPipe->IRPDescriptorPool: return
+StreamPipe->LedControllerAdapter: turn off
+StreamPipe->StateMachine: change state
+StreamPipe->OperationSystemAdapter: notify done
+end 
+end
+else 다른 Thread가 스케쥴링되는 경우
+StreamPipe->StreamPipe: blocking
+end

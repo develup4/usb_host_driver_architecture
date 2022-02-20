@@ -1,0 +1,24 @@
+@startuml
+actor "HostInterface"
+boundary "HostInterfaceProxy"
+control "MessagePipe"
+control "Enumerator"
+entity "DirectConnectedDevice"
+entity "IndirectConnectedDevice"
+
+HostInterface -> HostInterfaceProxy: 인터럽트 전달
+HostInterfaceProxy -> MessagePipe: 연결된 Device 정보 요청
+MessagePipe -> Enumerator: 연결된 Device 정보 요청
+
+loop 모든 DirectConnectedDevice에 대해
+    Enumerator -> DirectConnectedDevice: 정보 조회
+end
+
+loop 모든 IndirectConnectedDevice에 대해
+    Enumerator -> IndirectConnectedDevice: 정보 조회
+end
+
+Enumerator -> MessagePipe: 연결된 Device 정보 전달
+MessagePipe -> HostInterfaceProxy: 연결된 Device 정보 전달
+HostInterfaceProxy -> HostInterface: 인터럽트 전달
+@enduml

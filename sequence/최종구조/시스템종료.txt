@@ -1,0 +1,22 @@
+participant OperationSystemAdapter
+participant SystemInitiator
+participant DeviceConfigurator
+participant StreamPipe
+participant MessagePipe
+participant DeviceHashMap
+participant ResourceObserver
+participant LedControllerAdapter
+participant HostControllerAdapter
+ 
+OperationSystemAdapter -> SystemInitiator: request to halt
+SystemInitiator -> DeviceConfigurator: request information of all devices
+DeviceConfigurator -> SystemInitiator: response
+loop 모든 연결된 USB Device
+    SystemInitiator -> MessagePipe: notify to halt
+    MessagePipe -> HostControllerAdapter: Control transfer
+    SystemInitiator -> StreamPipe: Remove Stream Pipe
+    SystemInitiator -> DeviceHashMap: Remove device
+end
+SystemInitiator -> MessagePipe: Remove Message Pipe
+SystemInitiator -> LedControllerAdapter: turn all LEDs off
+SystemInitiator -> ResourceObserver: Stop monitoring

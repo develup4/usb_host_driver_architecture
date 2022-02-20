@@ -1,0 +1,35 @@
+actor OperationSystem
+boundary OperationSystemInterface
+control StreamPipe
+entity DirectConnectedDevice
+entity IndirectConnectedDevice
+boundary LedInterface
+boundary HostInterface
+actor LedController
+actor HostController
+
+alt USB Device가 데이터를 전송하는 경우
+	HostController ->HostInterface: Transfer
+	HostInterface ->StreamPipe: Transaction Push
+    
+    alt 루트 허브에 연결된 디바이스 여부
+      	StreamPipe -> DirectConnectedDevice: 상태 변경
+    else NO
+        StreamPipe -> IndirectConnectedDevice: 상태 변경
+    end
+    
+    StreamPipe -> LedInterface: Data Rate 전달
+	LedInterface -> LedController: 인터럽트 전달
+end
+
+OperationSystem -> OperationSystemInterface: System Call
+OperationSystemInterface -> StreamPipe: Read
+StreamPipe ->StreamPipe: IRP 구성
+StreamPipe ->OperationSystemInterface: 구성된 IRP 주소 전달
+OperationSystemInterface ->OperationSystem: Response
+
+alt 루트 허브에 연결된 디바이스 여부
+    StreamPipe -> DirectConnectedDevice: 상태 변경
+else NO
+    StreamPipe -> IndirectConnectedDevice: 상태 변경
+end

@@ -1,0 +1,83 @@
+@startuml
+actor "DeviceInterface"
+actor "MemoryInterface"
+actor "LedInterface"
+boundary "DeviceInterfaceProxy"
+boundary "MemoryInterfaceProxy"
+boundary "LedInterfaceProxy"
+control "Enumerator"
+entity "KnownDeviceList"
+control "UsbClassPermission"
+entity "DirectConnectedDevice"
+entity "IndirectConnectedDevice"
+control "ResourceNegotiator"
+entity "PowerResource"
+entity "BandwidthResource"
+control "MessagePipe"
+control "StreamPipe"
+boundary "HostInterfaceProxy"
+actor "HostInterface"
+
+DeviceInterface-> DeviceInterfaceProxy: 인터럽트 전달
+DeviceInterfaceProxy -> Enumerator: 디바이스 연결 통보
+Enumerator -> DeviceInterfaceProxy: 최소 전력 전달 명령
+DeviceInterfaceProxy-> DeviceInterface: 인터럽트 전달
+DeviceInterface-> DeviceInterfaceProxy: 인터럽트 전달
+DeviceInterfaceProxy-> Enumerator: 전력 전달 통보
+Enumerator -> DeviceInterfaceProxy: 주소 할당
+DeviceInterfaceProxy-> DeviceInterface: 인터럽트 전달
+DeviceInterface-> DeviceInterfaceProxy: 인터럽트 전달
+DeviceInterfaceProxy-> Enumerator: VID, PID 전달
+Enumerator -> KnownDeviceList: 연결된적있는 장치인지 확인
+
+alt 연결된적이 없다면
+    Enumerator -> DeviceInterfaceProxy: 전체 디스크립터 요청
+    DeviceInterfaceProxy-> DeviceInterface: 인터럽트 전달
+    DeviceInterface-> DeviceInterfaceProxy: 인터럽트 전달
+    DeviceInterfaceProxy-> Enumerator: 전체 디스크립터 전달
+    Enumerator -> UsbClassPermission: 수용 가능여부 질의
+
+    alt 클래스 수용 불가능
+        break
+            Enumerator -> MessagePipe: 수용 불가능 디바이스 통보 요청
+            MessagePipe -> HostInterfaceProxy: 수용 불가능 디바이스 통보 요청
+            HostInterfaceProxy -> HostInterface: 인터럽트 전달
+        end
+    end
+end
+
+Enumerator -> ResourceNegotiator: 필요 리소스 수용가능여부 확인
+ResourceNegotiator -> PowerResource: 가용 리소스 확인
+ResourceNegotiator -> BandwidthResource: 가용 리소스 확인
+
+alt 필요리소스 수용가능여부
+    ResourceNegotiator -> Enumerator: 수용 가능
+else 수용 불가능
+    ResourceNegotiator -> Enumerator: 협상된 리소스 정보 전달
+end
+
+Enumerator -> DeviceInterfaceProxy: 할단된 전력 공급 요청
+DeviceInterfaceProxy -> DeviceInterface: 인터럽트 전달
+
+alt 루트 허브에 연결된 디바이스 여부
+    Enumerator -> DirectConnectedDevice: 생성
+    Enumerator -> LedInterfaceProxy: LED와 디바이스 매핑
+    LedInterfaceProxy-> LedInterface: LED 점등 명령
+else NO
+    Enumerator -> IndirectConnectedDevice: 생성
+end
+Enumerator -> StreamPipe: 스트림 파이프 생성
+
+alt 루트 허브에 연결된 디바이스 여부
+    Enumerator -> DirectConnectedDevice: 생성된 파이프와 디바이스 매핑
+else NO
+    Enumerator -> IndirectConnectedDevice: 생성된 파이프와 디바이스 매핑
+end
+
+Enumerator -> KnownDeviceList: 리스트에 디바이스 추가
+Enumerator -> MemoryInterfaceProxy: KnownDevice 저장 요청
+MemoryInterfaceProxy -> MemoryInterface: 인터럽트 전달
+Enumerator -> MessagePipe: 파이프 생성을 통보 요청
+MessagePipe -> HostInterfaceProxy: 파이프 생성을 통보 요청
+HostInterfaceProxy -> HostInterface: 인터럽트 전달
+@enduml

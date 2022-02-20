@@ -1,0 +1,36 @@
+actor OperationSystem
+boundary OperationSystemInterface
+control StreamPipe
+entity DirectConnectedDevice
+entity IndirectConnectedDevice
+boundary LedInterface
+boundary HostInterface
+actor LedController
+actor HostController
+
+OperationSystem -> OperationSystemInterface: Systen Call(IRP)
+OperationSystemInterface -> StreamPipe: Push
+
+alt 루트 허브에 연결된 디바이스 여부
+    StreamPipe -> DirectConnectedDevice: 상태 변경
+else NO
+    StreamPipe -> IndirectConnectedDevice: 상태 변경
+end
+
+loop IRP의 Payload가 모두 전송될 때까지
+     StreamPipe -> HostInterface: Stream Pipe 전송방식에 따라 Transaction 전송
+     HostInterface-> HostController: Transfer
+      HostController ->HostInterface: Data Rate 전달
+     HostInterface->StreamPipe: Data Rate 전달
+     StreamPipe -> LedInterface: Data Rate 전달
+     LedInterface -> LedController: 인터럽트 전달
+end
+
+StreamPipe -> LedInterface: 점멸 해제 요청
+LedInterface -> LedController: 인터럽트 전달
+
+alt 루트 허브에 연결된 디바이스 여부
+    StreamPipe -> DirectConnectedDevice: 상태 변경
+else NO
+    StreamPipe -> IndirectConnectedDevice: 상태 변경
+end

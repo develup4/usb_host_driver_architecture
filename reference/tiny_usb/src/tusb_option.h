@@ -255,7 +255,7 @@
 #endif
 
 #ifndef CFG_TUD_AUDIO
-  #define CFG_TUD_AUDIO           0
+  #define CFG_TUD_AUDIO           1
 #endif
 
 #ifndef CFG_TUD_VIDEO

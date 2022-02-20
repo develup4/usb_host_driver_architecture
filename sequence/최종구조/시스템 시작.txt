@@ -1,0 +1,28 @@
+participant OperationSystemAdapter
+
+participant MessagePipe
+participant LedControllerAdapter
+participant SystemInitiator
+participant ClassPermission
+participant ResourceObserver
+participant PowerResource
+participant BandwidthResource
+participant HostControllerAdapter
+ 
+OperationSystemAdapter-> SystemInitiator: notify to start
+SystemInitiator -> MessagePipe: create Message Pipe
+SystemInitiator -> OperationSystemAdapter: request available USB Class
+activate OperationSystemAdapter
+OperationSystemAdapter -> SystemInitiator: response
+deactivate OperationSystemAdapter
+SystemInitiator -> ClassPermission: update available USB Class
+SystemInitiator -> LedControllerAdapter: flicker during 3 seconds
+SystemInitiator -> ResourceObserver: request to start monitoring available resource
+loop 10ms
+    ResourceObserver -> HostControllerAdapter: request available resource
+    activate HostControllerAdapter
+    HostControllerAdapter-> ResourceObserver: response
+    deactivate HostControllerAdapter
+    ResourceObserver -> PowerResource: update
+    ResourceObserver -> BandwidthResource: update
+end

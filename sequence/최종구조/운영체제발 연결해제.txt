@@ -1,0 +1,22 @@
+participant OperationSystemAdapter
+participant StreamPipe
+participant MessagePipe
+participant DeviceConfigurator
+participant DeviceHashMap
+participant HostControllerAdapter
+ 
+OperationSystemAdapter -> MessagePipe: request to release device
+
+alt Graceful 연결 해제 요청인 경우
+    MessagePipe -> HostControllerAdapter: Control Transfer(Graceful Release)
+    activate HostControllerAdapter
+    HostControllerAdapter-> MessagePipe: ACK
+    deactivate HostControllerAdapter
+else NO
+    MessagePipe -> HostControllerAdapter: Control transfer(Immediately Release)
+end 
+MessagePipe ->DeviceConfigurator: request to release resource
+DeviceConfigurator -> StreamPipe: remove Stream Pipe
+DeviceConfigurator -> DeviceHashMap: remove Device
+DeviceConfigurator->MessagePipe: response
+MessagePipe->OperationSystemAdapter: response

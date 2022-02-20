@@ -1,0 +1,22 @@
+ClientSW->StreamPipe: send IRP
+loop IRP가 Transaction으로 모두 변환될 때까지
+StreamPipe->TransactionPayloadPool: request memory block
+TransactionPayloadPool->StreamPipe: memory block
+StreamPipe->Transaction: make Transaction
+StreamPipe->TransactionQueue: push Transaction
+end 
+alt StreamPipe의 쓰레드가 스케쥴링되는 경우
+loop until all transactions in queue are sent
+StreamPipe->TransactionQueue: pop
+StreamPipe->HostInterface: send transaction
+HostInterface->StreamPipe: ACK
+StreamPipe->TransactionPayloadPool: return
+alt if 전송한 Transaction이 IRP의 마지막 Transaction인 경우
+StreamPipe->ClientSW: notify
+end
+end
+else 다른 쓰레드가 스케쥴링되는 경우
+loop 
+StreamPipe->StreamPipe: blocking
+end
+end

@@ -1,0 +1,38 @@
+actor OperationSystem
+actor LedController
+boundary OperationSystemInterface
+control MessagePipe
+control LedInterface
+control SystemInitiator
+entity ClassPermission
+control ResourceObserver
+entity PowerResource
+entity BandwidthResource
+boundary FlashController
+boundary HostInterface
+actor HostController
+
+OperationSystem-> OperationSystemInterface: System Call
+OperationSystemInterface-> SystemInitiator: 시스템 시작 
+SystemInitiator -> MessagePipe: 메시지 파이프 생성
+SystemInitiator -> OperationSystemInterface: 수용가능 USB 클래스 요청
+OperationSystemInterface -> OperationSystem: Request
+activate OperationSystem
+OperationSystem -> OperationSystemInterface: Response
+deactivate OperationSystem
+OperationSystemInterface -> SystemInitiator: 수용가능 USB 클래스 응답
+SystemInitiator -> ClassPermission: 수용가능 USB 클래스 업데이트
+SystemInitiator -> LedInterface: 전체 LED 3초간 점멸 요청
+LedInterface-> LedController: 인터럽트 전달
+SystemInitiator -> ResourceObserver: 리소스 모니터링 요청
+
+loop 10ms
+    ResourceObserver -> HostInterface: 가용자원 요청
+    HostInterface-> HostController: 인터럽트 전달
+    activate HostController
+    HostController-> HostInterface: 인터럽트 전달
+    deactivate HostController
+    HostInterface-> ResourceObserver: 가용자원 전달
+    ResourceObserver -> PowerResource: 업데이트
+    ResourceObserver -> BandwidthResource: 업데이트
+end

@@ -1,0 +1,19 @@
+actor OperationSystem
+boundary OperationSystemInterface
+control DeviceConfigurator
+entity DirectConnectedDevice
+entity IndirectConnectedDevice
+
+OperationSystem -> OperationSystemInterface: System Call
+OperationSystemInterface -> DeviceConfigurator: 연결된 Device 정보 요청
+
+loop 모든 DirectConnectedDevice에 대해
+    DeviceConfigurator -> DirectConnectedDevice: 정보 조회
+end
+
+loop 모든 IndirectConnectedDevice에 대해
+    DeviceConfigurator -> IndirectConnectedDevice: 정보 조회
+end
+
+DeviceConfigurator -> OperationSystemInterface: 연결된 Device 정보 전달
+OperationSystemInterface -> OperationSystem: Response
