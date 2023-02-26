@@ -1,8 +1,0 @@
-participant OperationSystemAdapter
-participant DeviceConfigurator
-participant DeviceHashMap
- 
-OperationSystemAdapter -> DeviceConfigurator: request
-DeviceConfigurator -> DeviceHashMap: getAllDevices
-DeviceHashMap->DeviceConfigurator: all Devices
-DeviceConfigurator -> OperationSystemAdapter: response
