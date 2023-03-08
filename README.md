@@ -1,24 +1,39 @@
-# usb_host_driver_architecture# usb_host_driver_architect
+# usb_host_driver_architecture
+<img width="1177" alt="image" src="https://user-images.githubusercontent.com/8960704/223727563-9868bb3f-f562-448a-823d-c3a2ead368c1.png">
 
-- 파일 정리 잘해서 한번 올려보지 뭐
-- 파일명같은거 영어로 바꾸자고
-- 필요한 강의 자료같은것도 있으면 넣어볼까?
-- 이름 변경 architecture_for_usb_host_driver
+## 기본적인 기능
+- USB 디바이스의 연결을 관리한다.
+- USB 디바이스의 제어 및 데이터 전송을 관리한다.
+- USB 디바이스의 전원을 관리한다.
+- Mass Storage Class
 
-⇒ 요구사항 문서를 잘활용하면 좋지않을까?
+<img width="1190" alt="image" src="https://user-images.githubusercontent.com/8960704/223727820-33afdcd2-5b06-4398-a19e-2bc85fc8347a.png">
 
-# 프로젝트 소개
+## 참고 URL
+https://www.usb.org/defined-class-codes
 
-usb host driver에 대한 설계문서입니다. waterfall의 표준적인 형식으로 작성되었습니다.
+## 품질 요구사항
+### 성능
+- 디바이스의 연결, 제어 등의 성능이 빠를 수록 좋다.
+### 변경 용이성 / 확장성
+- 하드웨어 사양의 변경이 용이할 수록 좋다.
+- 다양한 클래스로의 확장이 용이할 수록 좋다.
 
-## 제약사항
+## 과제 환경에 대한 설정
+- 어떤 기능 및 품질 측면에서 장점이 있는지 등 시스템의 동작 및 사업 환경은 각자 설정한다.
+- 솔루션이 최적화된 것을 판단할 수 있는 품질 시나리오가 검토되어야 한다.
+- 제약 사항의 변경에 대해서도 검토되어야 한다.
 
-블라블라
+## 최종 산출물
+https://github.com/develup4/usb_host_driver_architecture/blob/master/usb_host_driver_architecture_final.pdf
 
-## 요구사항
+## 디렉토리 구조
+### document
+도메인 지식에 대한 정리, 후보 구조에 대한 엑셀 파일, 전체 클래스 다이어그램(StarUML)이 있습니다.
+### requirement
+요구사항에 대한 문서가 있습니다.
+### sequence
+시퀀스 다이어그램을 위한 메타 파일들이 있습니다.
 
-문서 참고
-
-# 라이센스
-
-안됨
+## License
+GPL license
